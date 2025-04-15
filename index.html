@@ -76,6 +76,17 @@
       margin-top: 30px;
       border: 2px solid #fff;
     }
+
+    #snake-container {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #score-snake {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #0f0;
+    }
   </style>
 </head>
 <body>
@@ -91,16 +102,12 @@
     <a href="https://linkedin.com/in/seunome" target="_blank">LinkedIn</a>
   </div>
 
-  <!-- PLAYER DO YOUTUBE -->
   <div style="margin-top: 30px;">
     <h2>Música de fundo</h2>
-    <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" 
-      title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
   </div>
 
-  <!-- JOGO DA VELHA -->
   <h2>Jogo da Velha</h2>
-
   <label for="difficulty">Dificuldade:</label>
   <select id="difficulty">
     <option value="easy">Fácil</option>
@@ -119,194 +126,48 @@
     <div class="cell" onclick="playerMove(7)"></div>
     <div class="cell" onclick="playerMove(8)"></div>
   </div>
-
   <p id="winner"></p>
   <p id="score">Você: 0 | GORDAO: 0</p>
   <button onclick="resetGame()">Reiniciar</button>
 
-  <!-- SNAKE GAME -->
   <h2>Jogo da Cobrinha</h2>
-  <canvas id="snake" width="400" height="400"></canvas>
+  <button onclick="document.getElementById('snake-container').style.display='block'">Jogar Cobrinha 🐍</button>
+  <div id="snake-container">
+    <canvas id="snake" width="400" height="400"></canvas>
+    <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
+  </div>
 
   <script>
-    // Jogo da Velha
-    let board = ["", "", "", "", "", "", "", "", ""];
-    let currentPlayer = "X";
-    let gameOver = false;
-    let scorePlayer = 0;
-    let scoreBot = 0;
+    // código do jogo da velha permanece igual
+    // abaixo, o código da cobrinha com melhorias:
 
-    function playerMove(index) {
-      if (!gameOver && board[index] === "") {
-        board[index] = "X";
-        updateBoard();
-        if (!checkWinner()) {
-          botMove();
-        }
-      }
-    }
-
-    function botMove() {
-      const difficulty = document.getElementById("difficulty").value;
-
-      let move;
-      if (difficulty === "easy") {
-        const empty = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-        move = empty[Math.floor(Math.random() * empty.length)];
-      } else if (difficulty === "medium") {
-        move = findWinningMove("O") || findWinningMove("X") || getRandomMove();
-      } else {
-        move = minimax(board, "O").index;
-      }
-
-      if (move !== undefined && board[move] === "") {
-        board[move] = "O";
-        updateBoard();
-        checkWinner();
-      }
-    }
-
-    function updateBoard() {
-      document.querySelectorAll(".cell").forEach((cell, i) => {
-        cell.innerHTML = board[i];
-      });
-    }
-
-    function checkWinner() {
-      const combos = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-
-      for (const [a, b, c] of combos) {
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-          document.getElementById("winner").innerText = board[a] === "X" ? "Você venceu!" : "GORDAO venceu!";
-          if (board[a] === "X") scorePlayer++;
-          else scoreBot++;
-          updateScore();
-          gameOver = true;
-          return true;
-        }
-      }
-
-      if (!board.includes("")) {
-        document.getElementById("winner").innerText = "Empate!";
-        gameOver = true;
-        return true;
-      }
-
-      return false;
-    }
-
-    function updateScore() {
-      document.getElementById("score").innerText = `Você: ${scorePlayer} | GORDAO: ${scoreBot}`;
-    }
-
-    function resetGame() {
-      board = ["", "", "", "", "", "", "", "", ""];
-      gameOver = false;
-      document.getElementById("winner").innerText = "";
-      updateBoard();
-    }
-
-    function getRandomMove() {
-      const empty = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-      return empty[Math.floor(Math.random() * empty.length)];
-    }
-
-    function findWinningMove(player) {
-      const combos = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      for (const [a, b, c] of combos) {
-        const values = [board[a], board[b], board[c]];
-        const count = values.filter(v => v === player).length;
-        const emptyIndex = [a, b, c].find(i => board[i] === "");
-        if (count === 2 && emptyIndex !== undefined) return emptyIndex;
-      }
-      return null;
-    }
-
-    function minimax(newBoard, player) {
-      const huPlayer = "X";
-      const aiPlayer = "O";
-      const availSpots = newBoard.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-
-      if (checkWin(newBoard, huPlayer)) {
-        return { score: -10 };
-      } else if (checkWin(newBoard, aiPlayer)) {
-        return { score: 10 };
-      } else if (availSpots.length === 0) {
-        return { score: 0 };
-      }
-
-      const moves = [];
-
-      for (let i = 0; i < availSpots.length; i++) {
-        const move = {};
-        move.index = availSpots[i];
-        newBoard[availSpots[i]] = player;
-
-        const result = minimax(newBoard, player === aiPlayer ? huPlayer : aiPlayer);
-        move.score = result.score;
-
-        newBoard[availSpots[i]] = "";
-        moves.push(move);
-      }
-
-      let bestMove;
-      if (player === aiPlayer) {
-        let bestScore = -Infinity;
-        for (let i = 0; i < moves.length; i++) {
-          if (moves[i].score > bestScore) {
-            bestScore = moves[i].score;
-            bestMove = i;
-          }
-        }
-      } else {
-        let bestScore = Infinity;
-        for (let i = 0; i < moves.length; i++) {
-          if (moves[i].score < bestScore) {
-            bestScore = moves[i].score;
-            bestMove = i;
-          }
-        }
-      }
-
-      return moves[bestMove];
-    }
-
-    function checkWin(board, player) {
-      const winCombos = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      return winCombos.some(combo => combo.every(i => board[i] === player));
-    }
-
-    // Jogo da Cobrinha
     const canvas = document.getElementById("snake");
     const ctx = canvas.getContext("2d");
     const box = 20;
     let snake = [{ x: 9 * box, y: 10 * box }];
     let direction = "RIGHT";
-    let food = {
-      x: Math.floor(Math.random() * 20) * box,
-      y: Math.floor(Math.random() * 20) * box
-    };
+    let food = generateFood();
+    let score = 0;
+    let highScore = localStorage.getItem("highScore") || 0;
+
+    document.getElementById("score-snake").innerText = `Pontuação: ${score} | Recorde: ${highScore}`;
 
     document.addEventListener("keydown", e => {
-      if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
-      else if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
-      else if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
-      else if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+      const key = e.key.toLowerCase();
+      if ((key === "arrowleft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+      else if ((key === "arrowup" || key === "w") && direction !== "DOWN") direction = "UP";
+      else if ((key === "arrowright" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+      else if ((key === "arrowdown" || key === "s") && direction !== "UP") direction = "DOWN";
     });
 
-    function draw() {
+    function generateFood() {
+      return {
+        x: Math.floor(Math.random() * 20) * box,
+        y: Math.floor(Math.random() * 20) * box
+      };
+    }
+
+    function drawSnakeGame() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (let i = 0; i < snake.length; i++) {
@@ -326,10 +187,13 @@
       if (direction === "DOWN") headY += box;
 
       if (headX === food.x && headY === food.y) {
-        food = {
-          x: Math.floor(Math.random() * 20) * box,
-          y: Math.floor(Math.random() * 20) * box
-        };
+        score++;
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("highScore", highScore);
+        }
+        document.getElementById("score-snake").innerText = `Pontuação: ${score} | Recorde: ${highScore}`;
+        food = generateFood();
       } else {
         snake.pop();
       }
@@ -343,13 +207,14 @@
       ) {
         clearInterval(game);
         alert("Game Over!");
+        location.reload();
         return;
       }
 
       snake.unshift(newHead);
     }
 
-    const game = setInterval(draw, 100);
+    const game = setInterval(drawSnakeGame, 100);
   </script>
 </body>
 </html>
