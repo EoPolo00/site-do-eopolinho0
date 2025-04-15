@@ -131,35 +131,22 @@
   <button onclick="resetGame()">Reiniciar</button>
 
   <h2>Jogo da Cobrinha</h2>
-  <button onclick="document.getElementById('snake-container').style.display='block'">Jogar Cobrinha 🐍</button>
+  <button onclick="startSnakeGame()">Jogar Cobrinha 🐍</button>
   <div id="snake-container">
     <canvas id="snake" width="400" height="400"></canvas>
     <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
   </div>
 
   <script>
-    // Código corrigido e completo do jogo da velha será adicionado aqui...
-  </script>
-
-  <script>
     const canvas = document.getElementById("snake");
     const ctx = canvas.getContext("2d");
     const box = 20;
-    let snake = [{ x: 9 * box, y: 10 * box }];
-    let direction = "RIGHT";
-    let food = generateFood();
-    let score = 0;
+    let snake;
+    let direction;
+    let food;
+    let score;
     let highScore = localStorage.getItem("highScore") || 0;
-
-    document.getElementById("score-snake").innerText = `Pontuação: ${score} | Recorde: ${highScore}`;
-
-    document.addEventListener("keydown", e => {
-      const key = e.key.toLowerCase();
-      if ((key === "arrowleft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
-      else if ((key === "arrowup" || key === "w") && direction !== "DOWN") direction = "UP";
-      else if ((key === "arrowright" || key === "d") && direction !== "LEFT") direction = "RIGHT";
-      else if ((key === "arrowdown" || key === "s") && direction !== "UP") direction = "DOWN";
-    });
+    let game;
 
     function generateFood() {
       return {
@@ -208,14 +195,30 @@
       ) {
         clearInterval(game);
         alert("Game Over!");
-        location.reload();
         return;
       }
 
       snake.unshift(newHead);
     }
 
-    const game = setInterval(drawSnakeGame, 100);
+    function startSnakeGame() {
+      snake = [{ x: 9 * box, y: 10 * box }];
+      direction = "RIGHT";
+      food = generateFood();
+      score = 0;
+      document.getElementById("score-snake").innerText = `Pontuação: ${score} | Recorde: ${highScore}`;
+      if (game) clearInterval(game);
+      game = setInterval(drawSnakeGame, 100);
+      document.getElementById('snake-container').style.display = 'block';
+    }
+
+    document.addEventListener("keydown", e => {
+      const key = e.key.toLowerCase();
+      if ((key === "arrowleft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+      else if ((key === "arrowup" || key === "w") && direction !== "DOWN") direction = "UP";
+      else if ((key === "arrowright" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+      else if ((key === "arrowdown" || key === "s") && direction !== "UP") direction = "DOWN";
+    });
   </script>
 </body>
 </html>
