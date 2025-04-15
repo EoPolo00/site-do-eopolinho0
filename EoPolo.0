@@ -85,16 +85,13 @@
     <a href="https://linkedin.com/in/seunome" target="_blank">LinkedIn</a>
   </div>
 
-  <!-- PLAYER DO YOUTUBE -->
   <div style="margin-top: 30px;">
     <h2>Música de fundo</h2>
     <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" 
       title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
   </div>
 
-  <!-- JOGO DA VELHA -->
   <h2>Jogo da Velha</h2>
-
   <label for="difficulty">Dificuldade:</label>
   <select id="difficulty">
     <option value="easy">Fácil</option>
@@ -130,14 +127,13 @@
         board[index] = "X";
         updateBoard();
         if (!checkWinner()) {
-          setTimeout(botMove, 300);
+          botMove(); // sem delay
         }
       }
     }
 
     function botMove() {
       const difficulty = document.getElementById("difficulty").value;
-
       let move;
       if (difficulty === "easy") {
         const empty = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
