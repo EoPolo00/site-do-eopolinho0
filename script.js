@@ -1,4 +1,3 @@
-
 // Jogo da Velha
 let cells = document.querySelectorAll(".cell");
 let currentPlayer = "X";
@@ -33,7 +32,7 @@ function playerMove(index) {
       gameOver = true;
       return;
     }
-    setTimeout(botMove, 300);
+    botMove(); // sem delay!
   }
 }
 
@@ -46,6 +45,9 @@ function botMove() {
       winnerDisplay.textContent = "GORDAO venceu!";
       botScore++;
       updateScore();
+      gameOver = true;
+    } else if (board.every(cell => cell !== "")) {
+      winnerDisplay.textContent = "Empate!";
       gameOver = true;
     }
   }
@@ -89,7 +91,9 @@ function minimax(newBoard, player) {
     newBoard[i] = "";
     moves.push(move);
   }
-  return moves.reduce((best, move) => (player === "O" ? move.score > best.score : move.score < best.score) ? move : best);
+  return moves.reduce((best, move) =>
+    (player === "O" ? move.score > best.score : move.score < best.score) ? move : best
+  );
 }
 
 function checkWinner(player, customBoard = board) {
