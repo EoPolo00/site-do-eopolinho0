@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EoPolo.0</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1.2em;
+    }
+
+    .social a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #1e90ff;
+    }
+
+    .social a:hover {
+      text-decoration: underline;
+    }
+
+    .foto {
+      margin: 30px 0;
+    }
+
+    #game {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: #fff;
+      color: #000;
+      font-size: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .cell:hover {
+      background: #ddd;
+    }
+
+    button, select {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    h2, #winner, #score {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>EoPolo.0</h1>
+
+  <div class="foto">
+    <img src="https://www.exitlag.com/blog/wp-content/uploads/2024/10/skye-valorant-agents.webp" alt="Imagem do site" width="250">
+  </div>
+
+  <p>Bem-vindo ao meu site pessoal!</p>
+  <div class="social">
+    <a href="https://instagram.com/seunome" target="_blank">Instagram</a>
+    <a href="https://linkedin.com/in/seunome" target="_blank">LinkedIn</a>
+  </div>
+
+  <!-- PLAYER DO YOUTUBE -->
+  <div style="margin-top: 30px;">
+    <h2>Música de fundo</h2>
+    <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" 
+      title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+
+  <!-- JOGO DA VELHA -->
+  <h2>Jogo da Velha</h2>
+
+  <label for="difficulty">Dificuldade:</label>
+  <select id="difficulty">
+    <option value="easy">Fácil</option>
+    <option value="medium">Médio</option>
+    <option value="hard">Impossível</option>
+  </select>
+
+  <div id="game">
+    <div class="cell" onclick="playerMove(0)"></div>
+    <div class="cell" onclick="playerMove(1)"></div>
+    <div class="cell" onclick="playerMove(2)"></div>
+    <div class="cell" onclick="playerMove(3)"></div>
+    <div class="cell" onclick="playerMove(4)"></div>
+    <div class="cell" onclick="playerMove(5)"></div>
+    <div class="cell" onclick="playerMove(6)"></div>
+    <div class="cell" onclick="playerMove(7)"></div>
+    <div class="cell" onclick="playerMove(8)"></div>
+  </div>
+
+  <p id="winner"></p>
+  <p id="score">Você: 0 | GORDAO: 0</p>
+  <button onclick="resetGame()">Reiniciar</button>
+
+  <script>
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let currentPlayer = "X";
+    let gameOver = false;
+    let scorePlayer = 0;
+    let scoreBot = 0;
+
+    function playerMove(index) {
+      if (!gameOver && board[index] === "") {
+        board[index] = "X";
+        updateBoard();
+        if (!checkWinner()) {
+          setTimeout(botMove, 300);
+        }
+      }
+    }
+
+    function botMove() {
+      const difficulty = document.getElementById("difficulty").value;
+
+      let move;
+      if (difficulty === "easy") {
+        const empty = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+        move = empty[Math.floor(Math.random() * empty.length)];
+      } else if (difficulty === "medium") {
+        move = findWinningMove("O") || findWinningMove("X") || getRandomMove();
+      } else {
+        move = minimax(board, "O").index;
+      }
+
+      if (move !== undefined && board[move] === "") {
+        board[move] = "O";
+        updateBoard();
+        checkWinner();
+      }
+    }
+
+    function updateBoard() {
+      document.querySelectorAll(".cell").forEach((cell, i) => {
+        cell.innerHTML = board[i];
+      });
+    }
+
+    function checkWinner() {
+      const combos = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+
+      for (const [a, b, c] of combos) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          document.getElementById("winner").innerText = board[a] === "X" ? "Você venceu!" : "GORDAO venceu!";
+          if (board[a] === "X") scorePlayer++;
+          else scoreBot++;
+          updateScore();
+          gameOver = true;
+          return true;
+        }
+      }
+
+      if (!board.includes("")) {
+        document.getElementById("winner").innerText = "Empate!";
+        gameOver = true;
+        return true;
+      }
+
+      return false;
+    }
+
+    function updateScore() {
+      document.getElementById("score").innerText = `Você: ${scorePlayer} | GORDAO: ${scoreBot}`;
+    }
+
+    function resetGame() {
+      board = ["", "", "", "", "", "", "", "", ""];
+      gameOver = false;
+      document.getElementById("winner").innerText = "";
+      updateBoard();
+    }
+
+    function getRandomMove() {
+      const empty = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+      return empty[Math.floor(Math.random() * empty.length)];
+    }
+
+    function findWinningMove(player) {
+      const combos = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (const [a, b, c] of combos) {
+        const values = [board[a], board[b], board[c]];
+        const count = values.filter(v => v === player).length;
+        const emptyIndex = [a, b, c].find(i => board[i] === "");
+        if (count === 2 && emptyIndex !== undefined) return emptyIndex;
+      }
+      return null;
+    }
+
+    function minimax(newBoard, player) {
+      const huPlayer = "X";
+      const aiPlayer = "O";
+      const availSpots = newBoard.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+
+      if (checkWin(newBoard, huPlayer)) {
+        return { score: -10 };
+      } else if (checkWin(newBoard, aiPlayer)) {
+        return { score: 10 };
+      } else if (availSpots.length === 0) {
+        return { score: 0 };
+      }
+
+      const moves = [];
+
+      for (let i = 0; i < availSpots.length; i++) {
+        const move = {};
+        move.index = availSpots[i];
+        newBoard[availSpots[i]] = player;
+
+        const result = minimax(newBoard, player === aiPlayer ? huPlayer : aiPlayer);
+        move.score = result.score;
+
+        newBoard[availSpots[i]] = "";
+        moves.push(move);
+      }
+
+      let bestMove;
+      if (player === aiPlayer) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < moves.length; i++) {
+          if (moves[i].score > bestScore) {
+            bestScore = moves[i].score;
+            bestMove = i;
+          }
+        }
+      } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < moves.length; i++) {
+          if (moves[i].score < bestScore) {
+            bestScore = moves[i].score;
+            bestMove = i;
+          }
+        }
+      }
+
+      return moves[bestMove];
+    }
+
+    function checkWin(board, player) {
+      const winCombos = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return winCombos.some(combo => combo.every(i => board[i] === player));
+    }
+  </script>
+</body>
+</html>
