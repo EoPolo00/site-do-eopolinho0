@@ -7,19 +7,31 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #000;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    video#bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
       color: #fff;
       text-align: center;
       padding: 50px;
     }
 
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 1.2em;
+    .foto img {
+      border-radius: 10px;
     }
 
     .social a {
@@ -32,24 +44,7 @@
       text-decoration: underline;
     }
 
-    .foto {
-      margin: 30px 0;
-    }
-
-    .games-container {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      flex-wrap: wrap;
-      margin-top: 30px;
-    }
-
-    .game-box {
-      flex: 1;
-      min-width: 320px;
-    }
-
-    #game {
+    #game, #snake-container {
       display: grid;
       grid-template-columns: repeat(3, 100px);
       gap: 5px;
@@ -80,97 +75,190 @@
       cursor: pointer;
     }
 
-    h2, #winner, #score {
-      color: white;
-    }
-
     canvas {
       background: #111;
-      margin-top: 20px;
       border: 2px solid #fff;
-    }
-
-    #snake-container {
-      display: none;
-      margin-top: 20px;
+      margin: auto;
     }
 
     #score-snake {
-      margin-top: 10px;
-      font-size: 1.2em;
       color: #0f0;
+      margin-top: 10px;
+    }
+
+    .games-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 50px;
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
-  <h1>EoPolo.0</h1>
+  <video id="bg-video" autoplay muted loop>
+    <source src="c459e797-ca23-455f-8621-1856cf95fe56.mp4" type="video/mp4" />
+    Seu navegador não suporta vídeos em HTML5.
+  </video>
 
-  <div class="foto">
-    <img src="https://www.exitlag.com/blog/wp-content/uploads/2024/10/skye-valorant-agents.webp" alt="Imagem do site" width="250">
-  </div>
+  <div class="content">
+    <h1>EoPolo.0</h1>
 
-  <p>Bem-vindo ao meu site pessoal!</p>
-  <div class="social">
-    <a href="https://instagram.com/seunome" target="_blank">Instagram</a>
-    <a href="https://linkedin.com/in/seunome" target="_blank">LinkedIn</a>
-  </div>
-
-  <div style="margin-top: 30px;">
-    <h2>Música de fundo</h2>
-    <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-  </div>
-
-  <div class="games-container">
-    <div class="game-box">
-      <h2>Jogo da Velha</h2>
-      <label for="difficulty">Dificuldade:</label>
-      <select id="difficulty">
-        <option value="easy">Fácil</option>
-        <option value="medium">Médio</option>
-        <option value="hard">Impossível</option>
-      </select>
-
-      <div id="game">
-        <div class="cell" onclick="playerMove(0)"></div>
-        <div class="cell" onclick="playerMove(1)"></div>
-        <div class="cell" onclick="playerMove(2)"></div>
-        <div class="cell" onclick="playerMove(3)"></div>
-        <div class="cell" onclick="playerMove(4)"></div>
-        <div class="cell" onclick="playerMove(5)"></div>
-        <div class="cell" onclick="playerMove(6)"></div>
-        <div class="cell" onclick="playerMove(7)"></div>
-        <div class="cell" onclick="playerMove(8)"></div>
-      </div>
-      <p id="winner"></p>
-      <p id="score">Você: 0 | GORDAO: 0</p>
-      <button onclick="resetGame()">Reiniciar</button>
+    <div class="foto">
+      <img src="https://www.exitlag.com/blog/wp-content/uploads/2024/10/skye-valorant-agents.webp" alt="Imagem do site" width="250">
     </div>
 
-    <div class="game-box">
-      <h2>Jogo da Cobrinha</h2>
-      <button onclick="startSnakeGame()">Jogar Cobrinha 🐍</button>
-      <div id="snake-container">
-        <canvas id="snake" width="400" height="400"></canvas>
-        <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
+    <p>Bem-vindo ao meu site pessoal!</p>
+    <div class="social">
+      <a href="https://instagram.com/seunome" target="_blank">Instagram</a>
+      <a href="https://linkedin.com/in/seunome" target="_blank">LinkedIn</a>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h2>Música de fundo</h2>
+      <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+    <div class="games-container">
+      <div>
+        <h2>Jogo da Velha</h2>
+        <label for="difficulty">Dificuldade:</label>
+        <select id="difficulty">
+          <option value="easy">Fácil</option>
+          <option value="medium">Médio</option>
+          <option value="hard">Impossível</option>
+        </select>
+        <div id="game"></div>
+        <p id="winner"></p>
+        <p id="score">Você: 0 | GORDAO: 0</p>
+        <button onclick="resetGame()">Reiniciar</button>
+      </div>
+
+      <div>
+        <h2>Jogo da Cobrinha</h2>
+        <button onclick="document.getElementById('snake-container').style.display='block'">Jogar Cobrinha 🐍</button>
+        <div id="snake-container" style="display:none;">
+          <canvas id="snake" width="300" height="300"></canvas>
+          <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
+    // JOGO DA VELHA
+    const gameBoard = document.getElementById("game");
+    const cells = Array.from({ length: 9 }, (_, i) => {
+      const div = document.createElement("div");
+      div.className = "cell";
+      div.onclick = () => playerMove(i);
+      gameBoard.appendChild(div);
+      return div;
+    });
+
+    let board = Array(9).fill(null);
+    let currentPlayer = "X";
+    let gameActive = true;
+    let playerScore = 0;
+    let botScore = 0;
+
+    function playerMove(index) {
+      if (!gameActive || board[index]) return;
+      board[index] = "X";
+      cells[index].textContent = "X";
+      if (checkWinner("X")) return endGame("Você venceu!");
+      if (board.every(cell => cell)) return endGame("Empate!");
+      setTimeout(botMove, 300);
+    }
+
+    function botMove() {
+      const difficulty = document.getElementById("difficulty").value;
+      let move;
+      if (difficulty === "easy") {
+        const empty = board.map((v, i) => v ? null : i).filter(v => v !== null);
+        move = empty[Math.floor(Math.random() * empty.length)];
+      } else if (difficulty === "medium") {
+        move = minimax(board, "O", 1).index;
+      } else {
+        move = minimax(board, "O").index;
+      }
+
+      board[move] = "O";
+      cells[move].textContent = "O";
+      if (checkWinner("O")) return endGame("GORDAO venceu!");
+      if (board.every(cell => cell)) return endGame("Empate!");
+    }
+
+    function checkWinner(player) {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return winPatterns.some(pattern => pattern.every(i => board[i] === player));
+    }
+
+    function endGame(message) {
+      document.getElementById("winner").textContent = message;
+      gameActive = false;
+      if (message.includes("Você")) playerScore++;
+      else if (message.includes("GORDAO")) botScore++;
+      document.getElementById("score").textContent = `Você: ${playerScore} | GORDAO: ${botScore}`;
+    }
+
+    function resetGame() {
+      board = Array(9).fill(null);
+      cells.forEach(c => c.textContent = "");
+      document.getElementById("winner").textContent = "";
+      gameActive = true;
+    }
+
+    function minimax(newBoard, player, depth = 10) {
+      const empty = newBoard.map((v, i) => v ? null : i).filter(v => v !== null);
+      if (checkWinner("X")) return { score: -10 };
+      if (checkWinner("O")) return { score: 10 };
+      if (empty.length === 0 || depth === 0) return { score: 0 };
+
+      const moves = [];
+      for (let i of empty) {
+        const move = {};
+        move.index = i;
+        newBoard[i] = player;
+
+        const result = minimax(newBoard, player === "O" ? "X" : "O", depth - 1);
+        move.score = result.score;
+
+        newBoard[i] = null;
+        moves.push(move);
+      }
+
+      return player === "O"
+        ? moves.reduce((a, b) => a.score > b.score ? a : b)
+        : moves.reduce((a, b) => a.score < b.score ? a : b);
+    }
+
+    // JOGO DA COBRINHA
     const canvas = document.getElementById("snake");
     const ctx = canvas.getContext("2d");
     const box = 20;
-    let snake;
-    let direction;
-    let food;
-    let score;
+    let snake = [{ x: 5 * box, y: 5 * box }];
+    let direction = "RIGHT";
+    let food = spawnFood();
+    let snakeScore = 0;
     let highScore = localStorage.getItem("highScore") || 0;
-    let game;
 
-    function generateFood() {
+    document.addEventListener("keydown", e => {
+      const key = e.key.toLowerCase();
+      if ((key === "arrowleft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+      else if ((key === "arrowup" || key === "w") && direction !== "DOWN") direction = "UP";
+      else if ((key === "arrowright" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+      else if ((key === "arrowdown" || key === "s") && direction !== "UP") direction = "DOWN";
+    });
+
+    function spawnFood() {
       return {
-        x: Math.floor(Math.random() * 20) * box,
-        y: Math.floor(Math.random() * 20) * box
+        x: Math.floor(Math.random() * (canvas.width / box)) * box,
+        y: Math.floor(Math.random() * (canvas.height / box)) * box,
       };
     }
 
@@ -194,13 +282,12 @@
       if (direction === "DOWN") headY += box;
 
       if (headX === food.x && headY === food.y) {
-        score++;
-        if (score > highScore) {
-          highScore = score;
+        snakeScore++;
+        if (snakeScore > highScore) {
+          highScore = snakeScore;
           localStorage.setItem("highScore", highScore);
         }
-        document.getElementById("score-snake").innerText = `Pontuação: ${score} | Recorde: ${highScore}`;
-        food = generateFood();
+        food = spawnFood();
       } else {
         snake.pop();
       }
@@ -210,34 +297,19 @@
       if (
         headX < 0 || headX >= canvas.width ||
         headY < 0 || headY >= canvas.height ||
-        snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
+        snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)
       ) {
-        clearInterval(game);
+        clearInterval(gameLoop);
         alert("Game Over!");
+        location.reload();
         return;
       }
 
       snake.unshift(newHead);
+      document.getElementById("score-snake").textContent = `Pontuação: ${snakeScore} | Recorde: ${highScore}`;
     }
 
-    function startSnakeGame() {
-      snake = [{ x: 9 * box, y: 10 * box }];
-      direction = "RIGHT";
-      food = generateFood();
-      score = 0;
-      document.getElementById("score-snake").innerText = `Pontuação: ${score} | Recorde: ${highScore}`;
-      if (game) clearInterval(game);
-      game = setInterval(drawSnakeGame, 100);
-      document.getElementById('snake-container').style.display = 'block';
-    }
-
-    document.addEventListener("keydown", e => {
-      const key = e.key.toLowerCase();
-      if ((key === "arrowleft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
-      else if ((key === "arrowup" || key === "w") && direction !== "DOWN") direction = "UP";
-      else if ((key === "arrowright" || key === "d") && direction !== "LEFT") direction = "RIGHT";
-      else if ((key === "arrowdown" || key === "s") && direction !== "UP") direction = "DOWN";
-    });
+    const gameLoop = setInterval(drawSnakeGame, 100);
   </script>
 </body>
 </html>
