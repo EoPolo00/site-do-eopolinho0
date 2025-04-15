@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -12,29 +13,38 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #000;
       color: #fff;
-      text-align: center;
-      padding: 0;
+      overflow-x: hidden;
     }
 
-    #video-background {
+    video#bg-video {
       position: fixed;
       top: 0;
       left: 0;
-      min-width: 100vw;
-      min-height: 100vh;
-      z-index: -1;
+      min-width: 100%;
+      min-height: 100%;
       object-fit: cover;
+      z-index: -1;
     }
 
-    h1 {
-      font-size: 3em;
-      margin: 20px 0 10px;
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 20px;
     }
 
-    .content {
-      padding: 30px;
+    .section {
+      flex: 1 1 400px;
+      max-width: 600px;
+      margin: 10px;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    h1, h2, p, #winner, #score, #score-snake {
+      text-align: center;
     }
 
     .social a {
@@ -48,15 +58,8 @@
     }
 
     .foto {
-      margin: 30px 0;
-    }
-
-    .game-section {
-      display: flex;
-      justify-content: center;
-      gap: 60px;
-      flex-wrap: wrap;
-      margin-top: 40px;
+      text-align: center;
+      margin: 20px 0;
     }
 
     #game {
@@ -64,7 +67,7 @@
       grid-template-columns: repeat(3, 100px);
       gap: 5px;
       justify-content: center;
-      margin-bottom: 10px;
+      margin: 20px auto;
     }
 
     .cell {
@@ -83,11 +86,6 @@
       background: #ddd;
     }
 
-    canvas {
-      background: #111;
-      border: 2px solid #fff;
-    }
-
     button, select {
       padding: 10px 20px;
       font-size: 1em;
@@ -95,207 +93,63 @@
       cursor: pointer;
     }
 
-    #score, #winner, #score-snake {
-      margin: 10px 0;
-      color: #fff;
-      font-size: 1.2em;
-    }
-
-    #snake-container {
+    canvas {
+      background: #111;
       display: block;
+      margin: 20px auto;
+      border: 2px solid #fff;
     }
   </style>
 </head>
 <body>
-  <video id="video-background" autoplay loop muted>
-    <source src="fundo.mp4" type="video/mp4" />
-    Seu navegador não suporta vídeo.
+  <video autoplay muted loop id="bg-video">
+    <source src="fundo.mp4" type="video/mp4">
+    Seu navegador não suporta vídeo em segundo plano.
   </video>
 
-  <div class="content">
-    <h1>EoPolo.0</h1>
+  <h1>EoPolo.0</h1>
+  <div class="foto">
+    <img src="https://www.exitlag.com/blog/wp-content/uploads/2024/10/skye-valorant-agents.webp" alt="Imagem do site" width="250">
+  </div>
+  <p>Bem-vindo ao meu site pessoal!</p>
+  <div class="social">
+    <a href="https://instagram.com/seunome" target="_blank">Instagram</a>
+    <a href="https://linkedin.com/in/seunome" target="_blank">LinkedIn</a>
+  </div>
 
-    <div class="foto">
-      <img src="https://www.exitlag.com/blog/wp-content/uploads/2024/10/skye-valorant-agents.webp" alt="Imagem do site" width="250">
-    </div>
+  <div style="text-align: center; margin: 30px 0;">
+    <h2>Música de fundo</h2>
+    <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
 
-    <p>Bem-vindo ao meu site pessoal!</p>
-    <div class="social">
-      <a href="https://instagram.com/seunome" target="_blank">Instagram</a>
-      <a href="https://linkedin.com/in/seunome" target="_blank">LinkedIn</a>
-    </div>
+  <div class="container">
+    <div class="section">
+      <h2>Jogo da Velha</h2>
+      <label for="difficulty">Dificuldade:</label>
+      <select id="difficulty">
+        <option value="easy">Fácil</option>
+        <option value="medium">Médio</option>
+        <option value="hard">Impossível</option>
+      </select>
 
-    <div style="margin-top: 30px;">
-      <h2>Música de fundo</h2>
-      <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    </div>
-
-    <div class="game-section">
-      <div>
-        <h2>Jogo da Velha</h2>
-        <label for="difficulty">Dificuldade:</label>
-        <select id="difficulty">
-          <option value="easy">Fácil</option>
-          <option value="medium">Médio</option>
-          <option value="hard">Impossível</option>
-        </select>
-        <div id="game"></div>
-        <p id="winner"></p>
-        <p id="score">Você: 0 | GORDAO: 0</p>
-        <button onclick="resetGame()">Reiniciar</button>
+      <div id="game">
+        <div class="cell" onclick="playerMove(0)"></div><div class="cell" onclick="playerMove(1)"></div><div class="cell" onclick="playerMove(2)"></div><div class="cell" onclick="playerMove(3)"></div><div class="cell" onclick="playerMove(4)"></div><div class="cell" onclick="playerMove(5)"></div><div class="cell" onclick="playerMove(6)"></div><div class="cell" onclick="playerMove(7)"></div><div class="cell" onclick="playerMove(8)"></div>
       </div>
+      <p id="winner"></p>
+      <p id="score">Você: 0 | GORDAO: 0</p>
+      <button onclick="resetGame()">Reiniciar</button>
+    </div>
 
-      <div id="snake-container">
-        <h2>Jogo da Cobrinha</h2>
+    <div class="section">
+      <h2>Jogo da Cobrinha</h2>
+      <button onclick="startSnakeGame()">Iniciar Cobrinha 🐍</button>
+      <div id="snake-container" style="display:none;">
         <canvas id="snake" width="400" height="400"></canvas>
         <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
       </div>
     </div>
   </div>
 
-  <script>
-    // Jogo da Velha
-    const cells = [];
-    const gameContainer = document.getElementById('game');
-    const winnerDisplay = document.getElementById('winner');
-    const scoreDisplay = document.getElementById('score');
-    const difficultySelect = document.getElementById('difficulty');
-
-    let board = Array(9).fill(null);
-    let currentPlayer = 'X';
-    let playerScore = 0;
-    let botScore = 0;
-
-    for (let i = 0; i < 9; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.addEventListener('click', () => playerMove(i));
-      gameContainer.appendChild(cell);
-      cells.push(cell);
-    }
-
-    function resetGame() {
-      board.fill(null);
-      cells.forEach(cell => cell.textContent = '');
-      currentPlayer = 'X';
-      winnerDisplay.textContent = '';
-    }
-
-    function playerMove(index) {
-      if (board[index] || checkWinner()) return;
-      board[index] = 'X';
-      cells[index].textContent = 'X';
-      if (checkWinner()) {
-        playerScore++;
-        winnerDisplay.textContent = 'Você venceu!';
-        updateScore();
-        return;
-      }
-      setTimeout(botMove, 200);
-    }
-
-    function botMove() {
-      if (checkWinner()) return;
-      const empty = board.map((val, i) => val === null ? i : null).filter(v => v !== null);
-      if (empty.length === 0) return;
-      const move = empty[Math.floor(Math.random() * empty.length)];
-      board[move] = 'O';
-      cells[move].textContent = 'O';
-      if (checkWinner()) {
-        botScore++;
-        winnerDisplay.textContent = 'GORDAO venceu!';
-        updateScore();
-      }
-    }
-
-    function updateScore() {
-      scoreDisplay.textContent = `Você: ${playerScore} | GORDAO: ${botScore}`;
-    }
-
-    function checkWinner() {
-      const winPatterns = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
-      ];
-      return winPatterns.some(pattern => {
-        const [a, b, c] = pattern;
-        return board[a] && board[a] === board[b] && board[b] === board[c];
-      });
-    }
-
-    // Jogo da Cobrinha
-    const canvas = document.getElementById("snake");
-    const ctx = canvas.getContext("2d");
-    const box = 20;
-    let snake = [{ x: 9 * box, y: 10 * box }];
-    let direction = "RIGHT";
-    let food = generateFood();
-    let score = 0;
-    let highScore = localStorage.getItem("highScore") || 0;
-
-    function generateFood() {
-      return {
-        x: Math.floor(Math.random() * 20) * box,
-        y: Math.floor(Math.random() * 20) * box
-      };
-    }
-
-    document.addEventListener("keydown", e => {
-      const key = e.key.toLowerCase();
-      if ((key === "arrowleft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
-      else if ((key === "arrowup" || key === "w") && direction !== "DOWN") direction = "UP";
-      else if ((key === "arrowright" || key === "d") && direction !== "LEFT") direction = "RIGHT";
-      else if ((key === "arrowdown" || key === "s") && direction !== "UP") direction = "DOWN";
-    });
-
-    function drawSnakeGame() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i === 0 ? "lime" : "green";
-        ctx.fillRect(snake[i].x, snake[i].y, box, box);
-      }
-      ctx.fillStyle = "red";
-      ctx.fillRect(food.x, food.y, box, box);
-
-      let headX = snake[0].x;
-      let headY = snake[0].y;
-
-      if (direction === "LEFT") headX -= box;
-      if (direction === "UP") headY -= box;
-      if (direction === "RIGHT") headX += box;
-      if (direction === "DOWN") headY += box;
-
-      if (headX === food.x && headY === food.y) {
-        score++;
-        if (score > highScore) {
-          highScore = score;
-          localStorage.setItem("highScore", highScore);
-        }
-        document.getElementById("score-snake").textContent = `Pontuação: ${score} | Recorde: ${highScore}`;
-        food = generateFood();
-      } else {
-        snake.pop();
-      }
-
-      const newHead = { x: headX, y: headY };
-
-      if (
-        headX < 0 || headX >= canvas.width ||
-        headY < 0 || headY >= canvas.height ||
-        snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
-      ) {
-        clearInterval(game);
-        alert("Game Over!");
-        location.reload();
-        return;
-      }
-
-      snake.unshift(newHead);
-    }
-
-    document.getElementById("score-snake").textContent = `Pontuação: ${score} | Recorde: ${highScore}`;
-    const game = setInterval(drawSnakeGame, 100);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
