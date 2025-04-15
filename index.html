@@ -5,33 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EoPolo.0</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
+    * {
+      box-sizing: border-box;
     }
 
-    video#bg-video {
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 0;
+    }
+
+    #video-background {
       position: fixed;
       top: 0;
       left: 0;
-      min-width: 100%;
-      min-height: 100%;
-      object-fit: cover;
+      min-width: 100vw;
+      min-height: 100vh;
       z-index: -1;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin: 20px 0 10px;
     }
 
     .content {
-      position: relative;
-      z-index: 1;
-      color: #fff;
-      text-align: center;
-      padding: 50px;
-    }
-
-    .foto img {
-      border-radius: 10px;
+      padding: 30px;
     }
 
     .social a {
@@ -44,12 +47,24 @@
       text-decoration: underline;
     }
 
-    #game, #snake-container {
+    .foto {
+      margin: 30px 0;
+    }
+
+    .game-section {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    #game {
       display: grid;
       grid-template-columns: repeat(3, 100px);
       gap: 5px;
       justify-content: center;
-      margin: 20px auto;
+      margin-bottom: 10px;
     }
 
     .cell {
@@ -68,37 +83,33 @@
       background: #ddd;
     }
 
-    button, select {
-      padding: 10px 20px;
-      font-size: 1em;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
     canvas {
       background: #111;
       border: 2px solid #fff;
-      margin: auto;
     }
 
-    #score-snake {
-      color: #0f0;
-      margin-top: 10px;
+    button, select {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin: 10px 5px;
+      cursor: pointer;
     }
 
-    .games-container {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 50px;
-      margin-top: 30px;
+    #score, #winner, #score-snake {
+      margin: 10px 0;
+      color: #fff;
+      font-size: 1.2em;
+    }
+
+    #snake-container {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <video id="bg-video" autoplay muted loop>
-    <source src="c459e797-ca23-455f-8621-1856cf95fe56.mp4" type="video/mp4" />
-    Seu navegador não suporta vídeos em HTML5.
+  <video id="video-background" autoplay loop muted>
+    <source src="fundo.mp4" type="video/mp4" />
+    Seu navegador não suporta vídeo.
   </video>
 
   <div class="content">
@@ -116,10 +127,10 @@
 
     <div style="margin-top: 30px;">
       <h2>Música de fundo</h2>
-      <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
 
-    <div class="games-container">
+    <div class="game-section">
       <div>
         <h2>Jogo da Velha</h2>
         <label for="difficulty">Dificuldade:</label>
@@ -134,118 +145,101 @@
         <button onclick="resetGame()">Reiniciar</button>
       </div>
 
-      <div>
+      <div id="snake-container">
         <h2>Jogo da Cobrinha</h2>
-        <button onclick="document.getElementById('snake-container').style.display='block'">Jogar Cobrinha 🐍</button>
-        <div id="snake-container" style="display:none;">
-          <canvas id="snake" width="300" height="300"></canvas>
-          <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
-        </div>
+        <canvas id="snake" width="400" height="400"></canvas>
+        <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
       </div>
     </div>
   </div>
 
   <script>
-    // JOGO DA VELHA
-    const gameBoard = document.getElementById("game");
-    const cells = Array.from({ length: 9 }, (_, i) => {
-      const div = document.createElement("div");
-      div.className = "cell";
-      div.onclick = () => playerMove(i);
-      gameBoard.appendChild(div);
-      return div;
-    });
+    // Jogo da Velha
+    const cells = [];
+    const gameContainer = document.getElementById('game');
+    const winnerDisplay = document.getElementById('winner');
+    const scoreDisplay = document.getElementById('score');
+    const difficultySelect = document.getElementById('difficulty');
 
     let board = Array(9).fill(null);
-    let currentPlayer = "X";
-    let gameActive = true;
+    let currentPlayer = 'X';
     let playerScore = 0;
     let botScore = 0;
 
-    function playerMove(index) {
-      if (!gameActive || board[index]) return;
-      board[index] = "X";
-      cells[index].textContent = "X";
-      if (checkWinner("X")) return endGame("Você venceu!");
-      if (board.every(cell => cell)) return endGame("Empate!");
-      setTimeout(botMove, 300);
-    }
-
-    function botMove() {
-      const difficulty = document.getElementById("difficulty").value;
-      let move;
-      if (difficulty === "easy") {
-        const empty = board.map((v, i) => v ? null : i).filter(v => v !== null);
-        move = empty[Math.floor(Math.random() * empty.length)];
-      } else if (difficulty === "medium") {
-        move = minimax(board, "O", 1).index;
-      } else {
-        move = minimax(board, "O").index;
-      }
-
-      board[move] = "O";
-      cells[move].textContent = "O";
-      if (checkWinner("O")) return endGame("GORDAO venceu!");
-      if (board.every(cell => cell)) return endGame("Empate!");
-    }
-
-    function checkWinner(player) {
-      const winPatterns = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      return winPatterns.some(pattern => pattern.every(i => board[i] === player));
-    }
-
-    function endGame(message) {
-      document.getElementById("winner").textContent = message;
-      gameActive = false;
-      if (message.includes("Você")) playerScore++;
-      else if (message.includes("GORDAO")) botScore++;
-      document.getElementById("score").textContent = `Você: ${playerScore} | GORDAO: ${botScore}`;
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.addEventListener('click', () => playerMove(i));
+      gameContainer.appendChild(cell);
+      cells.push(cell);
     }
 
     function resetGame() {
-      board = Array(9).fill(null);
-      cells.forEach(c => c.textContent = "");
-      document.getElementById("winner").textContent = "";
-      gameActive = true;
+      board.fill(null);
+      cells.forEach(cell => cell.textContent = '');
+      currentPlayer = 'X';
+      winnerDisplay.textContent = '';
     }
 
-    function minimax(newBoard, player, depth = 10) {
-      const empty = newBoard.map((v, i) => v ? null : i).filter(v => v !== null);
-      if (checkWinner("X")) return { score: -10 };
-      if (checkWinner("O")) return { score: 10 };
-      if (empty.length === 0 || depth === 0) return { score: 0 };
-
-      const moves = [];
-      for (let i of empty) {
-        const move = {};
-        move.index = i;
-        newBoard[i] = player;
-
-        const result = minimax(newBoard, player === "O" ? "X" : "O", depth - 1);
-        move.score = result.score;
-
-        newBoard[i] = null;
-        moves.push(move);
+    function playerMove(index) {
+      if (board[index] || checkWinner()) return;
+      board[index] = 'X';
+      cells[index].textContent = 'X';
+      if (checkWinner()) {
+        playerScore++;
+        winnerDisplay.textContent = 'Você venceu!';
+        updateScore();
+        return;
       }
-
-      return player === "O"
-        ? moves.reduce((a, b) => a.score > b.score ? a : b)
-        : moves.reduce((a, b) => a.score < b.score ? a : b);
+      setTimeout(botMove, 200);
     }
 
-    // JOGO DA COBRINHA
+    function botMove() {
+      if (checkWinner()) return;
+      const empty = board.map((val, i) => val === null ? i : null).filter(v => v !== null);
+      if (empty.length === 0) return;
+      const move = empty[Math.floor(Math.random() * empty.length)];
+      board[move] = 'O';
+      cells[move].textContent = 'O';
+      if (checkWinner()) {
+        botScore++;
+        winnerDisplay.textContent = 'GORDAO venceu!';
+        updateScore();
+      }
+    }
+
+    function updateScore() {
+      scoreDisplay.textContent = `Você: ${playerScore} | GORDAO: ${botScore}`;
+    }
+
+    function checkWinner() {
+      const winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+      return winPatterns.some(pattern => {
+        const [a, b, c] = pattern;
+        return board[a] && board[a] === board[b] && board[b] === board[c];
+      });
+    }
+
+    // Jogo da Cobrinha
     const canvas = document.getElementById("snake");
     const ctx = canvas.getContext("2d");
     const box = 20;
-    let snake = [{ x: 5 * box, y: 5 * box }];
+    let snake = [{ x: 9 * box, y: 10 * box }];
     let direction = "RIGHT";
-    let food = spawnFood();
-    let snakeScore = 0;
+    let food = generateFood();
+    let score = 0;
     let highScore = localStorage.getItem("highScore") || 0;
+
+    function generateFood() {
+      return {
+        x: Math.floor(Math.random() * 20) * box,
+        y: Math.floor(Math.random() * 20) * box
+      };
+    }
 
     document.addEventListener("keydown", e => {
       const key = e.key.toLowerCase();
@@ -255,21 +249,12 @@
       else if ((key === "arrowdown" || key === "s") && direction !== "UP") direction = "DOWN";
     });
 
-    function spawnFood() {
-      return {
-        x: Math.floor(Math.random() * (canvas.width / box)) * box,
-        y: Math.floor(Math.random() * (canvas.height / box)) * box,
-      };
-    }
-
     function drawSnakeGame() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       for (let i = 0; i < snake.length; i++) {
         ctx.fillStyle = i === 0 ? "lime" : "green";
         ctx.fillRect(snake[i].x, snake[i].y, box, box);
       }
-
       ctx.fillStyle = "red";
       ctx.fillRect(food.x, food.y, box, box);
 
@@ -282,12 +267,13 @@
       if (direction === "DOWN") headY += box;
 
       if (headX === food.x && headY === food.y) {
-        snakeScore++;
-        if (snakeScore > highScore) {
-          highScore = snakeScore;
+        score++;
+        if (score > highScore) {
+          highScore = score;
           localStorage.setItem("highScore", highScore);
         }
-        food = spawnFood();
+        document.getElementById("score-snake").textContent = `Pontuação: ${score} | Recorde: ${highScore}`;
+        food = generateFood();
       } else {
         snake.pop();
       }
@@ -297,19 +283,19 @@
       if (
         headX < 0 || headX >= canvas.width ||
         headY < 0 || headY >= canvas.height ||
-        snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)
+        snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
       ) {
-        clearInterval(gameLoop);
+        clearInterval(game);
         alert("Game Over!");
         location.reload();
         return;
       }
 
       snake.unshift(newHead);
-      document.getElementById("score-snake").textContent = `Pontuação: ${snakeScore} | Recorde: ${highScore}`;
     }
 
-    const gameLoop = setInterval(drawSnakeGame, 100);
+    document.getElementById("score-snake").textContent = `Pontuação: ${score} | Recorde: ${highScore}`;
+    const game = setInterval(drawSnakeGame, 100);
   </script>
 </body>
 </html>
