@@ -36,6 +36,19 @@
       margin: 30px 0;
     }
 
+    .games-container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .game-box {
+      flex: 1;
+      min-width: 320px;
+    }
+
     #game {
       display: grid;
       grid-template-columns: repeat(3, 100px);
@@ -73,7 +86,7 @@
 
     canvas {
       background: #111;
-      margin-top: 30px;
+      margin-top: 20px;
       border: 2px solid #fff;
     }
 
@@ -107,34 +120,40 @@
     <iframe width="300" height="150" src="https://www.youtube.com/embed/DehK_Y0TUbE?autoplay=0&loop=1&playlist=DehK_Y0TUbE" title="Angry Birds Theme" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
   </div>
 
-  <h2>Jogo da Velha</h2>
-  <label for="difficulty">Dificuldade:</label>
-  <select id="difficulty">
-    <option value="easy">Fácil</option>
-    <option value="medium">Médio</option>
-    <option value="hard">Impossível</option>
-  </select>
+  <div class="games-container">
+    <div class="game-box">
+      <h2>Jogo da Velha</h2>
+      <label for="difficulty">Dificuldade:</label>
+      <select id="difficulty">
+        <option value="easy">Fácil</option>
+        <option value="medium">Médio</option>
+        <option value="hard">Impossível</option>
+      </select>
 
-  <div id="game">
-    <div class="cell" onclick="playerMove(0)"></div>
-    <div class="cell" onclick="playerMove(1)"></div>
-    <div class="cell" onclick="playerMove(2)"></div>
-    <div class="cell" onclick="playerMove(3)"></div>
-    <div class="cell" onclick="playerMove(4)"></div>
-    <div class="cell" onclick="playerMove(5)"></div>
-    <div class="cell" onclick="playerMove(6)"></div>
-    <div class="cell" onclick="playerMove(7)"></div>
-    <div class="cell" onclick="playerMove(8)"></div>
-  </div>
-  <p id="winner"></p>
-  <p id="score">Você: 0 | GORDAO: 0</p>
-  <button onclick="resetGame()">Reiniciar</button>
+      <div id="game">
+        <div class="cell" onclick="playerMove(0)"></div>
+        <div class="cell" onclick="playerMove(1)"></div>
+        <div class="cell" onclick="playerMove(2)"></div>
+        <div class="cell" onclick="playerMove(3)"></div>
+        <div class="cell" onclick="playerMove(4)"></div>
+        <div class="cell" onclick="playerMove(5)"></div>
+        <div class="cell" onclick="playerMove(6)"></div>
+        <div class="cell" onclick="playerMove(7)"></div>
+        <div class="cell" onclick="playerMove(8)"></div>
+      </div>
+      <p id="winner"></p>
+      <p id="score">Você: 0 | GORDAO: 0</p>
+      <button onclick="resetGame()">Reiniciar</button>
+    </div>
 
-  <h2>Jogo da Cobrinha</h2>
-  <button onclick="startSnakeGame()">Jogar Cobrinha 🐍</button>
-  <div id="snake-container">
-    <canvas id="snake" width="400" height="400"></canvas>
-    <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
+    <div class="game-box">
+      <h2>Jogo da Cobrinha</h2>
+      <button onclick="startSnakeGame()">Jogar Cobrinha 🐍</button>
+      <div id="snake-container">
+        <canvas id="snake" width="400" height="400"></canvas>
+        <div id="score-snake">Pontuação: 0 | Recorde: 0</div>
+      </div>
+    </div>
   </div>
 
   <script>
